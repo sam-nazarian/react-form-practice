@@ -1,37 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const SimpleInput = (props) => {
   const [enteredName, setEnteredName] = useState(''); //updated name with every keystroke
-  const [enteredNameIsValid, setEnteredNameIsValid] = useState(false); //name is valid if it's not empty when submitted
   const [enteredNameTouched, setEnteredNameTouched] = useState(false); //name is touched when submitted
+
+  const enteredNameIsValid = enteredName.trim() !== ''; //everytime input is changed, it's checked for validity
+  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched; //if name is invalid & name is touched then name is invalid
 
   const nameInputChangeHandler = (event) => {
     setEnteredName(event.target.value);
-
-    if (event.target.value.trim() !== '') setEnteredNameIsValid(true);
   };
 
   const nameInputBlurHandler = (event) => {
     setEnteredNameTouched(true);
-
-    if (enteredName.trim() === '') setEnteredNameIsValid(false);
   };
 
   const formSubmissionHandler = (event) => {
     event.preventDefault();
-
     setEnteredNameTouched(true);
+
     if (enteredName.trim() === '') {
-      setEnteredNameIsValid(false);
       return;
     }
-    setEnteredNameIsValid(true);
 
     console.log(enteredName);
+
+    // reset form
     setEnteredName('');
+    setEnteredNameTouched(false);
   };
 
-  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched; //what we actually check
   const nameInputClasses = nameInputIsInvalid ? 'form-control invalid' : 'form-control';
 
   return (
