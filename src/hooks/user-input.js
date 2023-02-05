@@ -1,27 +1,49 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
 
+// initial states
+const initialInput = {
+  value: '',
+  isTouched: false,
+};
+
+// the name is stateReducer as it hold the state for the reducer
+const inputStateReducer = (state, action) => {
+  if (action.type === 'INPUT') {
+    return { value: action.value, isTouched: state.isTouched };
+  }
+
+  if (action.type === 'BLUR') {
+    return { value: state.value, isTouched: true };
+  }
+
+  if (action.type === 'RESET') {
+    return { value: '', isTouched: false };
+  }
+
+  return initialInput;
+};
+
+// use useReducer() if you're updating a state based on another state, which is not the case here, so it's not necessarily
 const useInput = (validateValue) => {
-  const [enteredValue, setEnteredValue] = useState('');
-  const [isTouched, setIsTouched] = useState(false);
+  const [inputState, dispatchInput] = useReducer(inputStateReducer, initialInput);
 
-  const valueIsValid = validateValue(enteredValue);
-  const hasError = !valueIsValid && isTouched;
+  const valueIsValid = validateValue(inputState.value);
+  const hasError = !valueIsValid && inputState.isTouched;
 
   const valueChangeHandler = (event) => {
-    setEnteredValue(event.target.value);
+    dispatchInput({ type: 'INPUT', value: event.target.value });
   };
 
   const inputBlurHandler = (event) => {
-    setIsTouched(true);
+    dispatchInput({ type: 'BLUR' });
   };
 
   const reset = () => {
-    setEnteredValue('');
-    setIsTouched(false);
+    dispatchInput({ type: 'RESET' });
   };
 
   return {
-    value: enteredValue,
+    value: inputState.value,
     isValid: valueIsValid,
     hasError,
     valueChangeHandler,
